@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GymHub Tracker</title>
+    <style>
+        :root {
+            --bg-dark: #1a1a1a;
+            --bg-card: #2d2d2d;
+            --color-text: #ffffff;
+            --color-muted: #888888;
+            --color-primary: #4ade80;
+            --contribution-0: #1f2937;
+            --contribution-1: #065f46;
+            --contribution-2: #047857;
+            --contribution-3: #059669;
+            --contribution-4: #10b981;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--color-text);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background-color: var(--bg-card);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #404040;
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .add-btn {
+            background-color: var(--color-primary);
+            color: #000;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: opacity 0.2s;
+        }
+
+        .add-btn:hover {
+            opacity: 0.9;
+        }
+
+        .stats {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--color-muted);
+            font-size: 14px;
+        }
+
+        .contribution-graph {
+            display: flex;
+            gap: 4px;
+        }
+
+        .weekday-labels {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding-right: 8px;
+            color: var(--color-muted);
+            font-size: 12px;
+        }
+
+        .graph-container {
+            flex: 1;
+        }
+
+        .month-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            color: var(--color-muted);
+            font-size: 12px;
+        }
+
+        .weeks {
+            display: flex;
+            gap: 4px;
+        }
+
+        .week {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .day {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .day:hover {
+            transform: scale(1.5);
+        }
+
+        .contribution-0 { background-color: var(--contribution-0); }
+        .contribution-1 { background-color: var(--contribution-1); }
+        .contribution-2 { background-color: var(--contribution-2); }
+        .contribution-3 { background-color: var(--contribution-3); }
+        .contribution-4 { background-color: var(--contribution-4); }
+
+        .legend {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 16px;
+            color: var(--color-muted);
+            font-size: 12px;
+        }
+
+        .alert {
+            background-color: var(--contribution-2);
+            color: white;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">GymHub Tracker</h1>
+            <button class="add-btn" id="addWorkout">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 5v14M5 12h14"/>
+                </svg>
+                Add Workout
+            </button>
+        </div>
+
+        <div class="alert" id="alert">
+            Workout recorded successfully! 💪
+        </div>
+
+        <div class="stats">
+            <div class="stat-item">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/>
+                    <line x1="8" y1="2" x2="8" y2="6"/>
+                    <line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+                <span>Selected: <span id="selectedDate"></span></span>
+            </div>
+            <div class="stat-item">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                </svg>
+                <span>Current Streak: <span id="streak">0</span> days</span>
+            </div>
+            <div class="stat-item">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                    <circle cx="9" cy="7" r="4"/>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+                <span>Total Workouts: <span id="total">0</span></span>
+            </div>
+        </div>
+
+        <div class="contribution-graph">
+            <div class="weekday-labels">
+                <span>Mon</span>
+                <span>Wed</span>
+                <span>Fri</span>
+            </div>
+            <div class="graph-container">
+                <div class="month-labels">
+                    <span>Jan</span>
+                    <span>Feb</span>
+                    <span>Mar</span>
+                    <span>Apr</span>
+                    <span>May</span>
+                    <span>Jun</span>
+                    <span>Jul</span>
+                    <span>Aug</span>
+                    <span>Sep</span>
+                    <span>Oct</span>
+                    <span>Nov</span>
+                    <span>Dec</span>
+                </div>
+                <div class="weeks" id="contributionGraph"></div>
+            </div>
+        </div>
+
+        <div class="legend">
+            <span>Less</span>
+            <div class="day contribution-0"></div>
+            <div class="day contribution-1"></div>
+            <div class="day contribution-2"></div>
+            <div class="day contribution-3"></div>
+            <div class="day contribution-4"></div>
+            <span>More</span>
+        </div>
+    </div>
+
+    <script>
+        class GymHub {
+            constructor() {
+                this.contributions = {};
+                this.selectedDate = this.formatDate(new Date());
+                this.init();
+            }
+
+            init() {
+                this.loadContributions();
+                this.renderGraph();
+                this.updateStats();
+                this.setupEventListeners();
+                document.getElementById('selectedDate').textContent = this.selectedDate;
+            }
+
+            formatDate(date) {
+                return date.toISOString().split('T')[0];
+            }
+
+            loadContributions() {
+                const saved = localStorage.getItem('gymhub-contributions');
+                this.contributions = saved ? JSON.parse(saved) : {};
+            }
+
+            saveContributions() {
+                localStorage.setItem('gymhub-contributions', JSON.stringify(this.contributions));
+            }
+
+            addContribution() {
+                const current = this.contributions[this.selectedDate] || 0;
+                this.contributions[this.selectedDate] = Math.min(current + 1, 4);
+                this.saveContributions();
+                this.renderGraph();
+                this.updateStats();
+                this.showAlert();
+            }
+
+            showAlert() {
+                const alert = document.getElementById('alert');
+                alert.style.display = 'block';
+                setTimeout(() => {
+                    alert.style.display = 'none';
+                }, 3000);
+            }
+
+            updateStats() {
+                const total = Object.values(this.contributions).reduce((a, b) => a + b, 0);
+                document.getElementById('total').textContent = total;
+
+                let streak = 0;
+                const today = new Date();
+                for (let i = 0; i < 365; i++) {
+                    const date = new Date(today);
+                    date.setDate(date.getDate() - i);
+                    const dateStr = this.formatDate(date);
+                    if (this.contributions[dateStr]) streak++;
+                    else break;
+                }
+                document.getElementById('streak').textContent = streak;
+            }
+
+            renderGraph() {
+                const container = document.getElementById('contributionGraph');
+                container.innerHTML = '';
+                const today = new Date();
+                
+                for (let week = 0; week < 53; week++) {
+                    const weekEl = document.createElement('div');
+                    weekEl.className = 'week';
+                    
+                    for (let day = 0; day < 7; day++) {
+                        const date = new Date(today);
+                        date.setDate(date.getDate() - (52 - week) * 7 - (6 - day));
+                        const dateStr = this.formatDate(date);
+                        
+                        const dayEl = document.createElement('div');
+                        dayEl.className = `day contribution-${this.contributions[dateStr] || 0}`;
+                        dayEl.title = `${dateStr}: ${this.contributions[dateStr] || 0} contributions`;
+                        dayEl.dataset.date = dateStr;
+                        
+                        weekEl.appendChild(dayEl);
+                    }
+                    
+                    container.appendChild(weekEl);
+                }
+            }
+
+            setupEventListeners() {
+                document.getElementById('addWorkout').addEventListener('click', () => {
+                    this.addContribution();
+                });
+
+                document.getElementById('contributionGraph').addEventListener('click', (e) => {
+                    if (e.target.classList.contains('day')) {
+                        this.selectedDate = e.target.dataset.date;
+                        document.getElementById('selectedDate').textContent = this.selectedDate;
+                    }
+                });
+            }
+        }
+
+        // Initialize the app
+        const app = new GymHub();
+    </script>
+</body>
+</html>
