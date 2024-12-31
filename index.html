@@ -6,286 +6,163 @@
     <title>GymHub Tracker</title>
     <style>
         :root {
-    --bg-dark: #111827;
-    --bg-card: #1f2937;
-    --color-text: #f3f4f6;
-    --color-muted: #9ca3af;
-    --color-primary: #10b981;
-    --color-primary-hover: #059669;
-    --contribution-0: #1f2937;
-    --contribution-1: #065f46;
-    --contribution-2: #047857;
-    --contribution-3: #059669;
-    --contribution-4: #10b981;
-    --border-color: #374151;
-    }
-
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-    }
-
-    body {
-        background-color: var(--bg-dark);
-        color: var(--color-text);
-        min-height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 32px;
-        line-height: 1.5;
-    }
-
-    .container {
-        max-width: 1000px;
-        width: 100%;
-        background-color: var(--bg-card);
-        border-radius: 16px;
-        padding: 32px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 
-                    0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        border: 1px solid var(--border-color);
-    }
-
-    .header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 32px;
-        padding-bottom: 24px;
-        border-bottom: 1px solid var(--border-color);
-    }
-
-    .title {
-        font-size: 28px;
-        font-weight: 700;
-        background: linear-gradient(to right, var(--color-primary), #4ade80);
-        -webkit-background-clip: text;
-        background-clip: text;
-        -webkit-text-fill-color: transparent;
-        letter-spacing: -0.025em;
-    }
-
-    .add-btn {
-        background-color: var(--color-primary);
-        color: #000;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 8px;
-        cursor: pointer;
-        font-weight: 600;
-        font-size: 14px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        transition: all 0.2s ease;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    .add-btn:hover {
-        background-color: var(--color-primary-hover);
-        transform: translateY(-1px);
-    }
-
-    .add-btn:active {
-        transform: translateY(0);
-    }
-
-    .stats {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 24px;
-        margin-bottom: 32px;
-        padding: 16px;
-        background-color: rgba(0, 0, 0, 0.2);
-        border-radius: 12px;
-        border: 1px solid var(--border-color);
-    }
-
-    .stat-item {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        color: var(--color-muted);
-        font-size: 14px;
-        padding: 8px;
-        transition: all 0.2s ease;
-    }
-
-    .stat-item:hover {
-        color: var(--color-text);
-        transform: translateX(4px);
-    }
-
-    .stat-item svg {
-        color: var(--color-primary);
-    }
-
-    .contribution-graph {
-        display: flex;
-        gap: 16px;
-        margin-top: 24px;
-        padding: 24px;
-        background-color: rgba(0, 0, 0, 0.2);
-        border-radius: 12px;
-        border: 1px solid var(--border-color);
-    }
-
-    .weekday-labels {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        padding-right: 12px;
-        color: var(--color-muted);
-        font-size: 12px;
-        font-weight: 500;
-    }
-
-    .graph-container {
-        flex: 1;
-        overflow-x: auto;
-        scrollbar-width: thin;
-        scrollbar-color: var(--color-primary) var(--bg-card);
-    }
-
-    .graph-container::-webkit-scrollbar {
-        height: 6px;
-    }
-
-    .graph-container::-webkit-scrollbar-track {
-        background: var(--bg-card);
-        border-radius: 3px;
-    }
-
-    .graph-container::-webkit-scrollbar-thumb {
-        background-color: var(--color-primary);
-        border-radius: 3px;
-    }
-
-    .month-labels {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 12px;
-        color: var(--color-muted);
-        font-size: 12px;
-        font-weight: 500;
-    }
-
-    .weeks {
-        display: flex;
-        gap: 4px;
-    }
-
-    .week {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-    }
-
-    .day {
-        width: 14px;
-        height: 14px;
-        border-radius: 3px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        border: 1px solid rgba(0, 0, 0, 0.1);
-    }
-
-    .day:hover {
-        transform: scale(1.4);
-        box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
-        border-color: var(--color-primary);
-    }
-
-    .legend {
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        gap: 8px;
-        margin-top: 24px;
-        color: var(--color-muted);
-        font-size: 12px;
-        font-weight: 500;
-    }
-
-    .alert {
-        background-color: var(--color-primary);
-        color: #000;
-        padding: 16px;
-        border-radius: 8px;
-        margin-bottom: 24px;
-        display: none;
-        font-weight: 500;
-        animation: slideIn 0.3s ease;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-
-    @keyframes slideIn {
-        from {
-            transform: translateY(-20px);
-            opacity: 0;
+            --bg-dark: #1a1a1a;
+            --bg-card: #2d2d2d;
+            --color-text: #ffffff;
+            --color-muted: #888888;
+            --color-primary: #4ade80;
+            --contribution-0: #1f2937;
+            --contribution-1: #065f46;
+            --contribution-2: #047857;
+            --contribution-3: #059669;
+            --contribution-4: #10b981;
         }
-        to {
-            transform: translateY(0);
-            opacity: 1;
-        }
-    }
 
-    @media (max-width: 768px) {
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
         body {
-            padding: 16px;
+            background-color: var(--bg-dark);
+            color: var(--color-text);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
         }
 
         .container {
-            padding: 20px;
+            max-width: 900px;
+            width: 100%;
+            background-color: var(--bg-card);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #404040;
         }
 
         .title {
             font-size: 24px;
+            font-weight: bold;
+        }
+
+        .add-btn {
+            background-color: var(--color-primary);
+            color: #000;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: opacity 0.2s;
+        }
+
+        .add-btn:hover {
+            opacity: 0.9;
         }
 
         .stats {
-            grid-template-columns: 1fr;
-            gap: 16px;
+            display: flex;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--color-muted);
+            font-size: 14px;
+        }
+
+        .contribution-graph {
+            display: flex;
+            gap: 4px;
+        }
+
+        .weekday-labels {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding-right: 8px;
+            color: var(--color-muted);
+            font-size: 12px;
+        }
+
+        .graph-container {
+            flex: 1;
+        }
+
+        .month-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            color: var(--color-muted);
+            font-size: 12px;
+        }
+
+        .weeks {
+            display: flex;
+            gap: 4px;
+        }
+
+        .week {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
         }
 
         .day {
             width: 12px;
             height: 12px;
+            border-radius: 2px;
+            cursor: pointer;
+            transition: transform 0.2s;
         }
 
-        .header {
-            flex-direction: column;
-            gap: 16px;
-            align-items: flex-start;
+        .day:hover {
+            transform: scale(1.5);
         }
 
-        .add-btn {
-            width: 100%;
-            justify-content: center;
-        }
-    }
+        .contribution-0 { background-color: var(--contribution-0); }
+        .contribution-1 { background-color: var(--contribution-1); }
+        .contribution-2 { background-color: var(--contribution-2); }
+        .contribution-3 { background-color: var(--contribution-3); }
+        .contribution-4 { background-color: var(--contribution-4); }
 
-    @media (max-width: 480px) {
-        .container {
-            padding: 16px;
+        .legend {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 16px;
+            color: var(--color-muted);
+            font-size: 12px;
         }
 
-        .contribution-graph {
+        .alert {
+            background-color: var(--contribution-2);
+            color: white;
             padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            display: none;
         }
-
-        .day {
-            width: 10px;
-            height: 10px;
-        }
-
-        .month-labels {
-            font-size: 10px;
-        }
-    }
     </style>
 </head>
 <body>
